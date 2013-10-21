@@ -47,6 +47,7 @@ import sys
 import cv2
 import numpy as np
 from VideoCapture import Device
+from PIL import Image
 
 def normalize(X, low, high, dtype=None):
     """Normalizes a given array in X to a value between low and high."""
@@ -62,8 +63,18 @@ def normalize(X, low, high, dtype=None):
         return np.asarray(X)
     return np.asarray(X, dtype=dtype)
 
+#funzione di riconoscimento facciale
+def detect(img):
+   
+    gray_image = img
+    rects = faceCascade.detectMultiScale(gray_image, 1.1, 2, cv2.cv.CV_HAAR_SCALE_IMAGE, (10,10))
+    cv2.cv.CV_HAAR_SCALE_IMAGE
+    if len(rects) == 0:
+        return [], img
+    rects[:, 2:] += rects[:, :2]
+    return rects, img
 
-def read_images(path, sz=None):
+def read_images(path, sz=None, cr=None):
     """Reads the images in a given folder, resizes images on the fly if size is given.
 
     Args:
@@ -84,9 +95,16 @@ def read_images(path, sz=None):
             for filename in os.listdir(subject_path):
                 try:
                     im = cv2.imread(os.path.join(subject_path, filename), cv2.IMREAD_GRAYSCALE)
+                    # crop the image on the face
+                    if (cr is not None):
+                        rect, img = detect(im)
+                        im = img[rect[0][1]:rect[0][3], rect[0][0]:rect[0][2]]
+                        
+                        #im = Image.fromarray(img)
                     # resize to given size (if given)
                     if (sz is not None):
                         im = cv2.resize(im, sz)
+                        cv2.imwrite('../data_pictures/prova.jpg',im)
                     X.append(np.asarray(im, dtype=np.uint8))
                     y.append(c)
                 except IOError, (errno, strerror):
@@ -103,7 +121,8 @@ paintsPath = '../data_paintings'
 picPath = '../data_pictures'
 
 cam.saveSnapshot('../data_pictures/picture/image.jpg')
-
+size = (518,720)
+faceCascade = cv2.CascadeClassifier("faceDet.xml")
 
 
 # This is where we write the images, if an output_dir is given
@@ -118,7 +137,7 @@ out_dir = None
 #    sys.exit()
 
 # Now read in the image data. This must be a valid path!
-[X,y] = read_images(paintsPath, (1280,720))
+[X,y] = read_images(paintsPath, size)
 # Convert labels to 32bit integers. This is a workaround for 64bit machines,
 # because the labels will truncated else. This will be fixed in code as
 # soon as possible, so Python users don't need to know about this.
@@ -146,7 +165,7 @@ model.train(np.asarray(X), np.asarray(y))
 #
 # model.predict is going to return the predicted label and
 # the associated confidence:
-[W, w] = read_images(picPath)
+[W, w] = read_images(picPath, size, 1)
 [p_label, p_confidence] = model.predict(np.asarray(W[0]))
 # Print it:
 print "Predicted label = %d (confidence=%.2f)" % (p_label, p_confidence)

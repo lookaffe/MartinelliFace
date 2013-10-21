@@ -20,7 +20,7 @@ def detect(img):
    
     gray_image = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
     rects = faceCascade.detectMultiScale(gray_image, 1.1, 2, cv2.cv.CV_HAAR_SCALE_IMAGE, (10,10))
-
+    cv2.cv.CV_HAAR_SCALE_IMAGE
     if len(rects) == 0:
         return [], img
     rects[:, 2:] += rects[:, :2]
