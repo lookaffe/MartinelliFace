@@ -105,6 +105,7 @@ def read_images(path, sz=None, cr=None):
                     if (sz is not None):
                         im = cv2.resize(im, sz)
                         cv2.imwrite('../data_pictures/prova.jpg',im)
+                        image=im
                     X.append(np.asarray(im, dtype=np.uint8))
                     y.append(c)
                 except IOError, (errno, strerror):
@@ -113,12 +114,13 @@ def read_images(path, sz=None, cr=None):
                     print "Unexpected error:", sys.exc_info()[0]
                     raise
             c = c+1
-    return [X,y]
+    return [X,y],image
 
 # Take a picture
 cam = Device()
 paintsPath = '../data_paintings'
 picPath = '../data_pictures'
+
 
 cam.saveSnapshot('../data_pictures/picture/image.jpg')
 size = (518,720)
@@ -137,7 +139,7 @@ out_dir = None
 #    sys.exit()
 
 # Now read in the image data. This must be a valid path!
-[X,y] = read_images(paintsPath, size)
+[X,y],image = read_images(paintsPath, size)
 # Convert labels to 32bit integers. This is a workaround for 64bit machines,
 # because the labels will truncated else. This will be fixed in code as
 # soon as possible, so Python users don't need to know about this.
@@ -165,10 +167,13 @@ model.train(np.asarray(X), np.asarray(y))
 #
 # model.predict is going to return the predicted label and
 # the associated confidence:
-[W, w] = read_images(picPath, size, 1)
+[W, w],image = read_images(picPath, size, 1)
 [p_label, p_confidence] = model.predict(np.asarray(W[0]))
 # Print it:
 print "Predicted label = %d (confidence=%.2f)" % (p_label, p_confidence)
+
+im = cv2.imread(os.path.join('../data_pictures/picture/image.jpg'))
+cv2.imshow("Original",image)
 # Cool! Finally we'll plot the Eigenfaces, because that's
 # what most people read in the papers are keen to see.
 #
@@ -191,14 +196,13 @@ else:
 # images. You could also use cv::normalize here, but sticking
 # to NumPy is much easier for now.
 # Note: eigenvectors are stored by column:
-for i in xrange(min(len(X), 16)):
-    eigenvector_i = eigenvectors[:,i].reshape(X[0].shape)
-    eigenvector_i_norm = normalize(eigenvector_i, 0, 255, dtype=np.uint8)
-    # Show or save the images:
-    if out_dir is None:
-        cv2.imshow("%s/eigenface_%d" % (out_dir,i), eigenvector_i_norm)
-    else:
-        cv2.imwrite("%s/eigenface_%d.png" % (out_dir,i), eigenvector_i_norm)
+eigenvector_p_label = eigenvectors[:,p_label].reshape(X[0].shape)
+eigenvector_p_label_norm = normalize(eigenvector_p_label, 0, 255, dtype=np.uint8)
+# Show or save the images:
+if out_dir is None:
+    cv2.imshow("%s/eigenface_%d" % (out_dir,p_label), eigenvector_p_label_norm)
+else:
+    cv2.imwrite("%s/eigenface_%d.png" % (out_dir,p_label), eigenvector_p_label_norm)
 # Show the images:
 if out_dir is None:
     cv2.waitKey(0)
