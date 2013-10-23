@@ -98,7 +98,7 @@ def read_images(path, sz=None, cr=None):
                     # crop the image on the face
                     if (cr is not None):
                         rect, img = detect(im)
-                        im = img[rect[0][1]:rect[0][3], rect[0][0]:rect[0][2]]
+                        im = img[rect[0][1]-25:rect[0][3]+200, rect[0][0]-10:rect[0][2]+10]
                         
                         #im = Image.fromarray(img)
                     # resize to given size (if given)
