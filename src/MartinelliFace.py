@@ -93,6 +93,30 @@ def read_images(path, sz=None, cr=None):
         for subdirname in dirnames:
             subject_path = os.path.join(dirname, subdirname)
             for filename in os.listdir(subject_path):
+<<<<<<< HEAD
+            	if filename.endswith('.jpg'):
+	                try:
+	                    im = cv2.imread(os.path.join(subject_path, filename), cv2.IMREAD_GRAYSCALE)
+	                    print os.path.join(subject_path, filename)
+	                    # crop the image on the face
+	                    if (cr is not None):
+	                        rect, img = detect(im)
+	                        im = img[rect[0][1]:rect[0][3], rect[0][0]:rect[0][2]]
+	                        
+	                        #im = Image.fromarray(img)
+	                    # resize to given size (if given)
+	                    if (sz is not None):
+	                    	print im, sz
+	                        im = cv2.resize(im, sz)
+	                        cv2.imwrite('../data_pictures/prova'+str(c)+'.jpg',im)
+	                    X.append(np.asarray(im, dtype=np.uint8))
+	                    y.append(c)
+	                except IOError, (errno, strerror):
+	                    print "I/O error({0}): {1}".format(errno, strerror)
+	                except:
+	                    print "Unexpected error:", sys.exc_info()[0]
+	                    raise
+=======
                 try:
                     im = cv2.imread(os.path.join(subject_path, filename), cv2.IMREAD_GRAYSCALE)
                     # crop the image on the face
@@ -113,6 +137,7 @@ def read_images(path, sz=None, cr=None):
                 except:
                     print "Unexpected error:", sys.exc_info()[0]
                     raise
+>>>>>>> 4383c973c8b98f8484c59a9d0cc552f6ca13ef4b
             c = c+1
     return [X,y],image
 
@@ -123,7 +148,7 @@ picPath = '../data_pictures'
 
 
 cam.saveSnapshot('../data_pictures/picture/image.jpg')
-size = (518,720)
+size = (259,360)
 faceCascade = cv2.CascadeClassifier("faceDet.xml")
 
 
@@ -153,8 +178,8 @@ y = np.asarray(y, dtype=np.int32)
 # Create the Eigenfaces model. We are going to use the default
 # parameters for this simple example, please read the documentation
 # for thresholding:
-model = cv2.createEigenFaceRecognizer()
-# Read
+model = cv2.createLBPHFaceRecognizer()
+# Readc
 # Learn the model. Remember our function returns Python lists,
 # so we use np.asarray to turn them into NumPy lists to make
 # the OpenCV wrapper happy:
@@ -171,9 +196,20 @@ model.train(np.asarray(X), np.asarray(y))
 [p_label, p_confidence] = model.predict(np.asarray(W[0]))
 # Print it:
 print "Predicted label = %d (confidence=%.2f)" % (p_label, p_confidence)
+<<<<<<< HEAD
+cv2.imshow("me", W[0])
+#cv2.imshow("Doppelganger", W[0])
+
+pdir=paintsPath+"/"+os.listdir(paintsPath)[p_label]
+print pdir
+im = cv2.imread(pdir+"/"+os.listdir(pdir)[0], cv2.IMREAD_GRAYSCALE)
+cv2.imshow("Doppelganger", X[p_label])
+
+=======
 
 im = cv2.imread(os.path.join('../data_pictures/picture/image.jpg'))
 cv2.imshow("Original",image)
+>>>>>>> 4383c973c8b98f8484c59a9d0cc552f6ca13ef4b
 # Cool! Finally we'll plot the Eigenfaces, because that's
 # what most people read in the papers are keen to see.
 #
@@ -181,21 +217,31 @@ cv2.imshow("Original",image)
 # data, because the cv::FaceRecognizer is a cv::Algorithm.
 #
 # You can see the available parameters with getParams():
-print model.getParams()
+#print model.getParams()
 # Now let's get some data:
-mean = model.getMat("mean")
-eigenvectors = model.getMat("eigenvectors")
+#mean = model.getMat("mean")
+#eigenvectors = model.getMat("eigenvectors")
 # We'll save the mean, by first normalizing it:
-mean_norm = normalize(mean, 0, 255, dtype=np.uint8)
-mean_resized = mean_norm.reshape(X[0].shape)
-if out_dir is None:
-    cv2.imshow("mean", mean_resized)
-else:
-    cv2.imwrite("%s/mean.png" % (out_dir), mean_resized)
+#mean_norm = normalize(mean, 0, 255, dtype=np.uint8)
+#mean_resized = mean_norm.reshape(X[0].shape)
+#if out_dir is None:
+#    cv2.imshow("mean", mean_resized)
+#else:
+#    cv2.imwrite("%s/mean.png" % (out_dir), mean_resized)
 # Turn the first (at most) 16 eigenvectors into grayscale
 # images. You could also use cv::normalize here, but sticking
 # to NumPy is much easier for now.
 # Note: eigenvectors are stored by column:
+<<<<<<< HEAD
+#for i in xrange(min(len(X), 16)):
+#    eigenvector_i = eigenvectors[:,i].reshape(X[0].shape)
+#    eigenvector_i_norm = normalize(eigenvector_i, 0, 255, dtype=np.uint8)
+    # Show or save the images:
+#    if out_dir is None:
+#        cv2.imshow("%s/eigenface_%d" % (out_dir,i), eigenvector_i_norm)
+#    else:
+#        cv2.imwrite("%s/eigenface_%d.png" % (out_dir,i), eigenvector_i_norm)
+=======
 eigenvector_p_label = eigenvectors[:,p_label].reshape(X[0].shape)
 eigenvector_p_label_norm = normalize(eigenvector_p_label, 0, 255, dtype=np.uint8)
 # Show or save the images:
@@ -203,7 +249,8 @@ if out_dir is None:
     cv2.imshow("%s/eigenface_%d" % (out_dir,p_label), eigenvector_p_label_norm)
 else:
     cv2.imwrite("%s/eigenface_%d.png" % (out_dir,p_label), eigenvector_p_label_norm)
+>>>>>>> 4383c973c8b98f8484c59a9d0cc552f6ca13ef4b
 # Show the images:
-if out_dir is None:
-    cv2.waitKey(0)
+#if out_dir is None:
+cv2.waitKey(0)
 
