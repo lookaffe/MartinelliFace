@@ -93,7 +93,7 @@ def read_images(path, sz=None, cr=None):
         for subdirname in dirnames:
             subject_path = os.path.join(dirname, subdirname)
             for filename in os.listdir(subject_path):
-<<<<<<< HEAD
+
             	if filename.endswith('.jpg'):
 	                try:
 	                    im = cv2.imread(os.path.join(subject_path, filename), cv2.IMREAD_GRAYSCALE)
@@ -116,30 +116,10 @@ def read_images(path, sz=None, cr=None):
 	                except:
 	                    print "Unexpected error:", sys.exc_info()[0]
 	                    raise
-=======
-                try:
-                    im = cv2.imread(os.path.join(subject_path, filename), cv2.IMREAD_GRAYSCALE)
-                    # crop the image on the face
-                    if (cr is not None):
-                        rect, img = detect(im)
-                        im = img[rect[0][1]:rect[0][3], rect[0][0]:rect[0][2]]
-                        
-                        #im = Image.fromarray(img)
-                    # resize to given size (if given)
-                    if (sz is not None):
-                        im = cv2.resize(im, sz)
-                        cv2.imwrite('../data_pictures/prova.jpg',im)
-                        image=im
-                    X.append(np.asarray(im, dtype=np.uint8))
-                    y.append(c)
-                except IOError, (errno, strerror):
-                    print "I/O error({0}): {1}".format(errno, strerror)
-                except:
-                    print "Unexpected error:", sys.exc_info()[0]
-                    raise
->>>>>>> 4383c973c8b98f8484c59a9d0cc552f6ca13ef4b
+
+
             c = c+1
-    return [X,y],image
+    return [X,y]
 
 # Take a picture
 cam = Device()
@@ -164,7 +144,7 @@ out_dir = None
 #    sys.exit()
 
 # Now read in the image data. This must be a valid path!
-[X,y],image = read_images(paintsPath, size)
+[X,y] = read_images(paintsPath, size)
 # Convert labels to 32bit integers. This is a workaround for 64bit machines,
 # because the labels will truncated else. This will be fixed in code as
 # soon as possible, so Python users don't need to know about this.
@@ -192,24 +172,20 @@ model.train(np.asarray(X), np.asarray(y))
 #
 # model.predict is going to return the predicted label and
 # the associated confidence:
-[W, w],image = read_images(picPath, size, 1)
+[W, w] = read_images(picPath, size, 1)
 [p_label, p_confidence] = model.predict(np.asarray(W[0]))
 # Print it:
 print "Predicted label = %d (confidence=%.2f)" % (p_label, p_confidence)
-<<<<<<< HEAD
+
 cv2.imshow("me", W[0])
 #cv2.imshow("Doppelganger", W[0])
 
 pdir=paintsPath+"/"+os.listdir(paintsPath)[p_label]
 print pdir
-im = cv2.imread(pdir+"/"+os.listdir(pdir)[0], cv2.IMREAD_GRAYSCALE)
+#im = cv2.imread(pdir+"/"+os.listdir(pdir)[0], cv2.IMREAD_GRAYSCALE)
 cv2.imshow("Doppelganger", X[p_label])
 
-=======
 
-im = cv2.imread(os.path.join('../data_pictures/picture/image.jpg'))
-cv2.imshow("Original",image)
->>>>>>> 4383c973c8b98f8484c59a9d0cc552f6ca13ef4b
 # Cool! Finally we'll plot the Eigenfaces, because that's
 # what most people read in the papers are keen to see.
 #
@@ -232,7 +208,7 @@ cv2.imshow("Original",image)
 # images. You could also use cv::normalize here, but sticking
 # to NumPy is much easier for now.
 # Note: eigenvectors are stored by column:
-<<<<<<< HEAD
+
 #for i in xrange(min(len(X), 16)):
 #    eigenvector_i = eigenvectors[:,i].reshape(X[0].shape)
 #    eigenvector_i_norm = normalize(eigenvector_i, 0, 255, dtype=np.uint8)
@@ -241,15 +217,6 @@ cv2.imshow("Original",image)
 #        cv2.imshow("%s/eigenface_%d" % (out_dir,i), eigenvector_i_norm)
 #    else:
 #        cv2.imwrite("%s/eigenface_%d.png" % (out_dir,i), eigenvector_i_norm)
-=======
-eigenvector_p_label = eigenvectors[:,p_label].reshape(X[0].shape)
-eigenvector_p_label_norm = normalize(eigenvector_p_label, 0, 255, dtype=np.uint8)
-# Show or save the images:
-if out_dir is None:
-    cv2.imshow("%s/eigenface_%d" % (out_dir,p_label), eigenvector_p_label_norm)
-else:
-    cv2.imwrite("%s/eigenface_%d.png" % (out_dir,p_label), eigenvector_p_label_norm)
->>>>>>> 4383c973c8b98f8484c59a9d0cc552f6ca13ef4b
 # Show the images:
 #if out_dir is None:
 cv2.waitKey(0)
