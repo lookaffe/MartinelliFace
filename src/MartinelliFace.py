@@ -70,9 +70,10 @@ def detect(img):
     rects = faceCascade.detectMultiScale(gray_image, 1.1, 2, cv2.cv.CV_HAAR_SCALE_IMAGE, (10,10))
     if len(rects) == 0:
         return [], img
+    re20 = int(rects[0][3]*0.2)
     rects[:, 2:] += rects[:, :2]
-    #rects[:, 1] += -10
-    #rects[:, 3] += +300
+    rects[:, 1] += -re20
+    rects[:, 3] += +re20
     return rects, img
 
 def read_images(path, sz=None, cr=None):
@@ -98,7 +99,7 @@ def read_images(path, sz=None, cr=None):
                 if filename.endswith('.jpg'):
                     try:
                         im = cv2.imread(os.path.join(subject_path, filename), cv2.IMREAD_GRAYSCALE)
-                        print os.path.join(subject_path, filename)
+                        #print os.path.join(subject_path, filename)
                         # crop the image on the face
                         if (cr is not None):
                             rect, img = detect(im)
@@ -107,7 +108,7 @@ def read_images(path, sz=None, cr=None):
                             #im = Image.fromarray(img)
                         # resize to given size (if given)
                         if (sz is not None):
-                            print im, sz
+                            #print im, sz
                             im = cv2.resize(im, sz)
                             cv2.imwrite('../data_pictures/prova'+str(c)+'.jpg',im)
                         X.append(np.asarray(im, dtype=np.uint8))
@@ -122,13 +123,14 @@ def read_images(path, sz=None, cr=None):
             c = c+1
     return [X,y]
 
+cv2.destroyAllWindows()
 # Take a picture
 cam = Device()
 paintsPath = '../data_paintings'
 picPath = '../data_pictures'
 
-
 cam.saveSnapshot('../data_pictures/picture/image.jpg')
+cv2.VideoCapture().release()
 size = (259,360)
 faceCascade = cv2.CascadeClassifier("faceDet.xml")
 
@@ -176,13 +178,13 @@ model.train(np.asarray(X), np.asarray(y))
 [W, w] = read_images(picPath, size, 1)
 [p_label, p_confidence] = model.predict(np.asarray(W[0]))
 # Print it:
-print "Predicted label = %d (confidence=%.2f)" % (p_label, p_confidence)
+#print "Predicted label = %d (confidence=%.2f)" % (p_label, p_confidence)
 
 cv2.imshow("me", W[0])
 #cv2.imshow("Doppelganger", W[0])
 
 pdir=paintsPath+"/"+os.listdir(paintsPath)[p_label]
-print pdir
+#print pdir
 #im = cv2.imread(pdir+"/"+os.listdir(pdir)[0], cv2.IMREAD_GRAYSCALE)
 cv2.imshow("Doppelganger", X[p_label])
 
