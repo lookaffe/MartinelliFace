@@ -179,16 +179,16 @@ model.train(np.asarray(X), np.asarray(y))
 # Print it:
 #print "Predicted label = %d (confidence=%.2f)" % (p_label, p_confidence)
 
-cv2.imshow("me", W[0])
+#cv2.imshow("me", W[0])
 #cv2.imshow("Doppelganger", W[0])
 
 pdir=paintsPath+"/"+os.listdir(paintsPath)[p_label]
 #print pdir
 #im = cv2.imread(pdir+"/"+os.listdir(pdir)[0], cv2.IMREAD_GRAYSCALE)
-cv2.imshow("Doppelganger", X[p_label])
+#cv2.imshow("Doppelganger", X[p_label])
 
-h1, w1 = X[p_label].shape[:2]
-h2, w2 = W[0].shape[:2]
+h1, w1 = W[0].shape[:2]
+h2, w2 = X[p_label].shape[:2]
 vis = np.zeros((max(h1, h2), w1+w2), np.uint8)
 vis[:h1, :w1] = X[p_label]
 vis[:h2, w1:w1+w2] = W[0]
