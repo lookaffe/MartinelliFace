@@ -110,7 +110,7 @@ def read_images(path, sz=None, cr=None):
                         if (sz is not None):
                             #print im, sz
                             im = cv2.resize(im, sz)
-                            cv2.imwrite('../data_pictures/prova'+str(c)+'.jpg',im)
+                            #cv2.imwrite('../data_pictures/prova'+str(c)+'.jpg',im)
                         X.append(np.asarray(im, dtype=np.uint8))
                         y.append(c)
                     except IOError, (errno, strerror):
