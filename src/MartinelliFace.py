@@ -67,7 +67,7 @@ def normalize(X, low, high, dtype=None):
 def detect(img):
    
     gray_image = img
-    rects = faceCascade.detectMultiScale(gray_image, 1.1, 2, cv2.cv.CV_HAAR_SCALE_IMAGE, (10,10))
+    rects = faceCascade.detectMultiScale(gray_image, 1.1, 2, cv2.cv.CV_HAAR_SCALE_IMAGE, (40,40))
     if len(rects) == 0:
         return [], img
     re20 = int(rects[0][3]*0.2)
@@ -160,7 +160,7 @@ y = np.asarray(y, dtype=np.int32)
 # Create the Eigenfaces model. We are going to use the default
 # parameters for this simple example, please read the documentation
 # for thresholding:
-model = cv2.createLBPHFaceRecognizer()
+model = cv2.createFisherFaceRecognizer()
 # Readc
 # Learn the model. Remember our function returns Python lists,
 # so we use np.asarray to turn them into NumPy lists to make
