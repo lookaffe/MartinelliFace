@@ -130,7 +130,6 @@ paintsPath = '../data_paintings'
 picPath = '../data_pictures'
 
 cam.saveSnapshot('../data_pictures/picture/image.jpg')
-cv2.VideoCapture().release()
 size = (259,360)
 faceCascade = cv2.CascadeClassifier("faceDet.xml")
 
