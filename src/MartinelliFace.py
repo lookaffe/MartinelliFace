@@ -187,7 +187,13 @@ pdir=paintsPath+"/"+os.listdir(paintsPath)[p_label]
 #im = cv2.imread(pdir+"/"+os.listdir(pdir)[0], cv2.IMREAD_GRAYSCALE)
 cv2.imshow("Doppelganger", X[p_label])
 
+h1, w1 = X[p_label].shape[:2]
+h2, w2 = W[0].shape[:2]
+vis = np.zeros((max(h1, h2), w1+w2), np.uint8)
+vis[:h1, :w1] = X[p_label]
+vis[:h2, w1:w1+w2] = W[0]
 
+cv2.imshow("merge", vis)
 # Cool! Finally we'll plot the Eigenfaces, because that's
 # what most people read in the papers are keen to see.
 #
