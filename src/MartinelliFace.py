@@ -160,7 +160,7 @@ y = np.asarray(y, dtype=np.int32)
 # Create the Eigenfaces model. We are going to use the default
 # parameters for this simple example, please read the documentation
 # for thresholding:
-model = cv2.createLBPHFaceRecognizer(100,16,10,10,10000)
+model = cv2.createEigenFaceRecognizer(400,10000)
 # Readc
 # Learn the model. Remember our function returns Python lists,
 # so we use np.asarray to turn them into NumPy lists to make
