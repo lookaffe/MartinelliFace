@@ -16,10 +16,6 @@ def training(paintsPath, size, model):
     # Thanks to Leo Dirac for reporting:
     y = np.asarray(y, dtype=np.int32)
     
-    # If a out_dir is given, set it:
-    #if len(sys.argv) == 3:
-    #    out_dir = sys.argv[2]
-        # Readc
     # Learn the model. Remember our function returns Python lists,
     # so we use np.asarray to turn them into NumPy lists to make
     # the OpenCV wrapper happy:
@@ -27,7 +23,7 @@ def training(paintsPath, size, model):
     model.save("model.xml")
     
 def createModel():
-    # Create the Eigenfaces model. We are going to use the default
+    # Create the Model. We are going to use the default
     # parameters for this simple example, please read the documentation
     # for thresholding:
     model = cv2.createFisherFaceRecognizer()

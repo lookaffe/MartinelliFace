@@ -1,13 +1,14 @@
 '''
 Created on 26/ott/2013
 
-@author: Cento
+@author: Laboratorio Creativo Geppetto
 '''
 
 import cv2
 import numpy as np
 import os, sys
 
+#face detector
 faceCascade = cv2.CascadeClassifier("faceDet.xml")
 
 #funzione di riconoscimento facciale
@@ -72,6 +73,7 @@ def read_images(path, sz=None, cr=None):
             c = c+1
     return [X,y]
 
+#mostra due immagini affiancate
 def showImage(W, paintsPath, p_label, size):
     h1, w1 = W[0].shape[:2]
     vis = np.zeros((max(h1, h1), w1+w1), np.uint8)
