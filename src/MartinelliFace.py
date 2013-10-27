@@ -42,12 +42,11 @@ Created on 19/ott/2013
 # Some underlying scripts like create_csv will not work in other versions, like Python 3.
 # ------------------------------------------------------------------------------------------------
 
-import os
-import sys
 import cv2
 import numpy as np
-from VideoCapture import Device
-from PIL import Image
+import imageUtils
+import training,time
+import serial
 
 def normalize(X, low, high, dtype=None):
     """Normalizes a given array in X to a value between low and high."""
@@ -63,169 +62,96 @@ def normalize(X, low, high, dtype=None):
         return np.asarray(X)
     return np.asarray(X, dtype=dtype)
 
-#funzione di riconoscimento facciale
-def detect(img):
-   
-    gray_image = img
-    rects = faceCascade.detectMultiScale(gray_image, 1.1, 2, cv2.cv.CV_HAAR_SCALE_IMAGE, (10,10))
-    if len(rects) == 0:
-        return [], img
-    re20 = int(rects[0][3]*0.2)
-    rects[:, 2:] += rects[:, :2]
-    rects[:, 1] += -re20
-    rects[:, 3] += +re20
-    return rects, img
+def cumShot():
+    vidFile = cv2.VideoCapture(0)
+    ret, im = vidFile.read()
+    cv2.imwrite('../data_pictures/picture/image.jpg',im)
+    cv2.VideoCapture(0).release
 
-def read_images(path, sz=None, cr=None):
-    """Reads the images in a given folder, resizes images on the fly if size is given.
+def main():    
+    # Create a model and training
+    model = training.createModel()
+    #training.training(paintsPath, size, model)
+    model.load("model.xml")
+    
+    # We now get a prediction from the model! In reality you
+    # should always use unseen images for testing your model.
+    # But so many people were confused, when I sliced an image
+    # off in the C++ version, so I am just using an image we
+    # have trained with.
+    #
+    # model.predict is going to return the predicted label and
+    # the associated confidence:
+    [W, w] = imageUtils.read_images(picPath, size, 1)
+    if W is None:
+        print("Faccia non riconosciuta")
+        exit()
+    [p_label, p_confidence] = model.predict(np.asarray(W[0]))
+    # Print it:
+    #print "Predicted label = %d (confidence=%.2f)" % (p_label, p_confidence)
+    
+    #cv2.imshow("me", W[0])
+    #cv2.imshow("Doppelganger", W[0])
+    
+    
+    vis = imageUtils.showImage(W, paintsPath, p_label, size)
+    cv2.imshow("merge", vis)
+    # Cool! Finally we'll plot the Eigenfaces, because that's
+    # what most people read in the papers are keen to see.
+    #
+    # Just like in C++ you have access to all model internal
+    # data, because the cv::FaceRecognizer is a cv::Algorithm.
+    #
+    # You can see the available parameters with getParams():
+    #print model.getParams()
+    # Now let's get some data:
+    #mean = model.getMat("mean")
+    #eigenvectors = model.getMat("eigenvectors")
+    # We'll save the mean, by first normalizing it:
+    #mean_norm = normalize(mean, 0, 255, dtype=np.uint8)
+    #mean_resized = mean_norm.reshape(X[0].shape)
+    #if out_dir is None:
+    #    cv2.imshow("mean", mean_resized)
+    #else:
+    #    cv2.imwrite("%s/mean.png" % (out_dir), mean_resized)
+    # Turn the first (at most) 16 eigenvectors into grayscale
+    # images. You could also use cv::normalize here, but sticking
+    # to NumPy is much easier for now.
+    # Note: eigenvectors are stored by column:
+    
+    #for i in xrange(min(len(X), 16)):
+    #    eigenvector_i = eigenvectors[:,i].reshape(X[0].shape)
+    #    eigenvector_i_norm = normalize(eigenvector_i, 0, 255, dtype=np.uint8)
+        # Show or save the images:
+    #    if out_dir is None:
+    #        cv2.imshow("%s/eigenface_%d" % (out_dir,i), eigenvector_i_norm)
+    #    else:
+    #        cv2.imwrite("%s/eigenface_%d.png" % (out_dir,i), eigenvector_i_norm)
+    # Show the images:
+    #if out_dir is None:
+    cv2.waitKey(5000)
+    cv2.destroyAllWindows()
+    global scanning
+    scanning = True
+    global ser
+    ser = serial.Serial(serialPort, 9600)
 
-    Args:
-        path: Path to a folder with subfolders representing the subjects (persons).
-        sz: A tuple with the size Resizes
 
-    Returns:
-        A list [X,y]
-
-            X: The images, which is a Python list of numpy arrays.
-            y: The corresponding labels (the unique number of the subject, person) in a Python list.
-    """
-    c = 0
-    X,y = [], []
-    for dirname, dirnames, filenames in os.walk(path):
-        for subdirname in dirnames:
-            subject_path = os.path.join(dirname, subdirname)
-            for filename in os.listdir(subject_path):
-
-                if filename.endswith('.jpg'):
-                    try:
-                        im = cv2.imread(os.path.join(subject_path, filename), cv2.IMREAD_GRAYSCALE)
-                        #print os.path.join(subject_path, filename)
-                        # crop the image on the face
-                        if (cr is not None):
-                            rect, img = detect(im)
-                            im = img[rect[0][1]:rect[0][3], rect[0][0]:rect[0][2]]
-                            
-                            #im = Image.fromarray(img)
-                        # resize to given size (if given)
-                        if (sz is not None):
-                            #print im, sz
-                            im = cv2.resize(im, sz)
-                            cv2.imwrite('../data_pictures/prova'+str(c)+'.jpg',im)
-                        X.append(np.asarray(im, dtype=np.uint8))
-                        y.append(c)
-                    except IOError, (errno, strerror):
-                        print "I/O error({0}): {1}".format(errno, strerror)
-                    except:
-                        print "Unexpected error:", sys.exc_info()[0]
-                        raise
-
-
-            c = c+1
-    return [X,y]
-
-cv2.destroyAllWindows()
 # Take a picture
-cam = Device()
 paintsPath = '../data_paintings'
 picPath = '../data_pictures'
-
-cam.saveSnapshot('../data_pictures/picture/image.jpg')
 size = (259,360)
-faceCascade = cv2.CascadeClassifier("faceDet.xml")
 
+serialPort = 'COM11'
+scanning = True
 
-# This is where we write the images, if an output_dir is given
-# in command line:
-out_dir = None
+ser = serial.Serial(serialPort, 9600)
+while scanning:
+    print ser.read()
+    if ser.read()=='1':
+        ser.close()
+        scanning = False
+        cumShot()
+        main()
 
-# You'll need at least a path to your image data, please see
-# the tutorial coming with this source code on how to prepare
-# your image data:
-#if len(sys.argv) < 2:
-#    print "USAGE: facerec_demo.py </path/to/images> [</path/to/store/images/at>]"
-#    sys.exit()
-
-# Now read in the image data. This must be a valid path!
-[X,y] = read_images(paintsPath, size)
-# Convert labels to 32bit integers. This is a workaround for 64bit machines,
-# because the labels will truncated else. This will be fixed in code as
-# soon as possible, so Python users don't need to know about this.
-# Thanks to Leo Dirac for reporting:
-y = np.asarray(y, dtype=np.int32)
-
-# If a out_dir is given, set it:
-#if len(sys.argv) == 3:
-#    out_dir = sys.argv[2]
-
-# Create the Eigenfaces model. We are going to use the default
-# parameters for this simple example, please read the documentation
-# for thresholding:
-model = cv2.createEigenFaceRecognizer(400,10000)
-# Readc
-# Learn the model. Remember our function returns Python lists,
-# so we use np.asarray to turn them into NumPy lists to make
-# the OpenCV wrapper happy:
-model.train(np.asarray(X), np.asarray(y))
-# We now get a prediction from the model! In reality you
-# should always use unseen images for testing your model.
-# But so many people were confused, when I sliced an image
-# off in the C++ version, so I am just using an image we
-# have trained with.
-#
-# model.predict is going to return the predicted label and
-# the associated confidence:
-[W, w] = read_images(picPath, size, 1)
-[p_label, p_confidence] = model.predict(np.asarray(W[0]))
-# Print it:
-#print "Predicted label = %d (confidence=%.2f)" % (p_label, p_confidence)
-
-#cv2.imshow("me", W[0])
-#cv2.imshow("Doppelganger", W[0])
-
-pdir=paintsPath+"/"+os.listdir(paintsPath)[p_label]
-#print pdir
-#im = cv2.imread(pdir+"/"+os.listdir(pdir)[0], cv2.IMREAD_GRAYSCALE)
-#cv2.imshow("Doppelganger", X[p_label])
-
-h1, w1 = W[0].shape[:2]
-h2, w2 = X[p_label].shape[:2]
-vis = np.zeros((max(h1, h2), w1+w2), np.uint8)
-vis[:h1, :w1] = X[p_label]
-vis[:h2, w1:w1+w2] = W[0]
-
-cv2.imshow("merge", vis)
-# Cool! Finally we'll plot the Eigenfaces, because that's
-# what most people read in the papers are keen to see.
-#
-# Just like in C++ you have access to all model internal
-# data, because the cv::FaceRecognizer is a cv::Algorithm.
-#
-# You can see the available parameters with getParams():
-#print model.getParams()
-# Now let's get some data:
-#mean = model.getMat("mean")
-#eigenvectors = model.getMat("eigenvectors")
-# We'll save the mean, by first normalizing it:
-#mean_norm = normalize(mean, 0, 255, dtype=np.uint8)
-#mean_resized = mean_norm.reshape(X[0].shape)
-#if out_dir is None:
-#    cv2.imshow("mean", mean_resized)
-#else:
-#    cv2.imwrite("%s/mean.png" % (out_dir), mean_resized)
-# Turn the first (at most) 16 eigenvectors into grayscale
-# images. You could also use cv::normalize here, but sticking
-# to NumPy is much easier for now.
-# Note: eigenvectors are stored by column:
-
-#for i in xrange(min(len(X), 16)):
-#    eigenvector_i = eigenvectors[:,i].reshape(X[0].shape)
-#    eigenvector_i_norm = normalize(eigenvector_i, 0, 255, dtype=np.uint8)
-    # Show or save the images:
-#    if out_dir is None:
-#        cv2.imshow("%s/eigenface_%d" % (out_dir,i), eigenvector_i_norm)
-#    else:
-#        cv2.imwrite("%s/eigenface_%d.png" % (out_dir,i), eigenvector_i_norm)
-# Show the images:
-#if out_dir is None:
-cv2.waitKey(0)
 
