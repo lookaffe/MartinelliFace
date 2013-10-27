@@ -33,6 +33,10 @@ def cumShot():
 
 #creazione del modello del riconoscitore, eventuale training e predizione
 def main():    
+    
+    global scanning
+    global ser
+    
     # Creazione modello
     model = training.createModel()
 
@@ -44,7 +48,9 @@ def main():
     [W, w] = imageUtils.read_images(picPath, size, 1)
     if W is None:
         print("Faccia non riconosciuta")
-        exit()
+        scanning = True
+        ser = serial.Serial(serialPort, 9600)
+        return None
     
     #Effettua la classificazione
     [p_label, p_confidence] = model.predict(np.asarray(W[0]))
@@ -57,9 +63,7 @@ def main():
     #chiude le finestre e si rimette in ascolto dell'arduino
     cv2.waitKey(5000)
     cv2.destroyAllWindows()
-    global scanning
     scanning = True
-    global ser
     ser = serial.Serial(serialPort, 9600)
 
 
