@@ -7,7 +7,7 @@ Created on 19/ott/2013
 import cv2
 import numpy as np
 import imageUtils
-import training,time
+import training
 import serial
 
 def normalize(X, low, high, dtype=None):
@@ -49,7 +49,7 @@ def main():
     if W is None:
         print("Faccia non riconosciuta")
         scanning = True
-        ser = serial.Serial(serialPort, 9600)
+        #ser = serial.Serial(serialPort, 9600)
         return None
     
     #Effettua la classificazione
@@ -64,7 +64,7 @@ def main():
     cv2.waitKey(5000)
     cv2.destroyAllWindows()
     scanning = True
-    ser = serial.Serial(serialPort, 9600)
+    #ser = serial.Serial(serialPort, 9600)
 
 
 #VARIABILI DA MODIFICARE 
@@ -75,6 +75,8 @@ paintsPath = '../data_paintings'
 picPath = '../data_pictures'
 #dimensioni delle immagini usate dal riconoscitore
 size = (259,360)
+
+"""
 #porta seriale dell'Arduino
 serialPort = 'COM11'
 scanning = True
@@ -86,5 +88,6 @@ while scanning:
     if ser.read()=='1':
         ser.close()
         scanning = False
-        camShot()
-        main()
+        """
+camShot()
+main()
