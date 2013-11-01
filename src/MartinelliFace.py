@@ -7,8 +7,7 @@ Created on 19/ott/2013
 import cv2
 import numpy as np
 import imageUtils
-import training
-import serial
+import training, os
 
 def normalize(X, low, high, dtype=None):
     """Normalizes a given array in X to a value between low and high."""
@@ -57,6 +56,9 @@ def main():
 
     #mostra l'immagine
     vis = imageUtils.showImage(W, paintsPath, p_label, size)
+    filename = paintsOriginalPath+ "/" +str(p_label) +"/" + str(p_label)+ ".jpg"
+    im = cv2.imread(filename, cv2.CV_LOAD_IMAGE_COLOR)
+    cv2.imshow(" ",im)
     cv2.imshow("merge", vis)
     
     #mostra le immagini di confronto per 5 secondi, poi 
@@ -73,6 +75,9 @@ def main():
 paintsPath = '../data_paintings'
 #Path immagine da analizzare
 picPath = '../data_pictures'
+#Path quadri totali
+paintsOriginalPath = '../original_paintings'
+
 #dimensioni delle immagini usate dal riconoscitore
 size = (259,360)
 

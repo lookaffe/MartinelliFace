@@ -6,7 +6,7 @@ Created on 26/ott/2013
 
 import cv2
 import numpy as np
-import os, sys
+import os, sys, copy
 
 #face detector
 faceCascade = cv2.CascadeClassifier("faceDet.xml")
@@ -18,6 +18,9 @@ def detect(img):
     rects = faceCascade.detectMultiScale(gray_image, 1.1, 2, cv2.cv.CV_HAAR_SCALE_IMAGE, (10,10))
     if len(rects) == 0:
         return [], img
+    im22 = copy.deepcopy(img)
+    im22 = img[rects[0][1]:rects[0][1]+rects[0][3], rects[0][0]:rects[0][0]+rects[0][2]]
+    cv2.imwrite('../data_pictures/provaFace.jpg',im22)
     re20 = int(rects[0][3]*0.2)
     rects[:, 2:] += rects[:, :2]
     rects[:, 1] += -re20
