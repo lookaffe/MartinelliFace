@@ -56,13 +56,16 @@ def main():
 
     #mostra l'immagine
     vis = imageUtils.showImage(W, paintsPath, p_label, size)
-    filename = paintsOriginalPath+ "/" +str(p_label) +"/" + str(p_label)+ ".jpg"
-    im = cv2.imread(filename, cv2.CV_LOAD_IMAGE_COLOR)
-    cv2.imshow(" ",im)
     cv2.imshow("merge", vis)
     
     #mostra le immagini di confronto per 5 secondi, poi 
     #chiude le finestre e si rimette in ascolto dell'arduino
+    cv2.waitKey(5000)
+    cv2.destroyAllWindows()
+    # mostra in dipinto originale
+    filename = paintsOriginalPath+ "/" +str(p_label) +"/" + str(p_label)+ ".jpg"
+    im = cv2.imread(filename, cv2.CV_LOAD_IMAGE_COLOR)
+    cv2.imshow(" ",im)
     cv2.waitKey(5000)
     cv2.destroyAllWindows()
     scanning = True
