@@ -53,7 +53,7 @@ def main():
     
     #Effettua la classificazione
     [p_label, p_confidence] = model.predict(np.asarray(W[0]))
-<<<<<<< HEAD
+
     
     #mostra l'immagine
 
@@ -63,17 +63,11 @@ def main():
     #metto al centro dell'immagine nera il confronto tra volto rilevato e quadro
     bg[bg.shape[0]/2-vis.shape[0]/2:bg.shape[0]/2+vis.shape[0]/2, bg.shape[1]/2-vis.shape[1]/2:bg.shape[1]/2+vis.shape[1]/2] = vis
     cv2.imshow("display", bg)
-=======
 
-    #mostra l'immagine
-    vis = imageUtils.showImage(W, paintsPath, p_label, size)
-    cv2.imshow("merge", vis)
->>>>>>> b816d2313ee32e2438bbad710531061b6fd4a1db
     
     #mostra le immagini di confronto per 5 secondi, poi 
     #chiude le finestre e si rimette in ascolto dell'arduino
     cv2.waitKey(5000)
-<<<<<<< HEAD
     
     siz = cv2.cv.GetSize(cv2.cv.fromarray(vis))
     
@@ -91,14 +85,7 @@ def main():
     im[0:thumbnail.shape[0], 0:thumbnail.shape[1],2] = thumbnail
     cv2.imshow('display',im)
     cv2.waitKey(15000)
-=======
-    cv2.destroyAllWindows()
-    # mostra in dipinto originale
-    filename = paintsOriginalPath+ "/" +str(p_label) +"/" + str(p_label)+ ".jpg"
-    im = cv2.imread(filename, cv2.CV_LOAD_IMAGE_COLOR)
-    cv2.imshow(" ",im)
-    cv2.waitKey(5000)
->>>>>>> b816d2313ee32e2438bbad710531061b6fd4a1db
+
     cv2.destroyAllWindows()
     scanning = True
     #ser = serial.Serial(serialPort, 9600)
@@ -115,10 +102,9 @@ paintsOriginalPath = '../original_paintings'
 
 #dimensioni delle immagini usate dal riconoscitore
 size = (259,360)
-<<<<<<< HEAD
+
 scsize= (800,1280)
-=======
->>>>>>> b816d2313ee32e2438bbad710531061b6fd4a1db
+
 
 """
 #porta seriale dell'Arduino
@@ -133,7 +119,6 @@ while scanning:
         ser.close()
         scanning = False
         """
-<<<<<<< HEAD
 #carico le immagini dell'interfaccia
 home = cv2.imread("home.jpg", cv2.IMREAD_GRAYSCALE)
 wait = cv2.imread("wait.jpg", cv2.IMREAD_GRAYSCALE)
@@ -148,7 +133,6 @@ cv2.waitKey()
 #visualizzo l'immagine di attesa
 cv2.imshow('display',wait)
 cv2.waitKey(1)
-=======
->>>>>>> b816d2313ee32e2438bbad710531061b6fd4a1db
+
 camShot()
 main()
