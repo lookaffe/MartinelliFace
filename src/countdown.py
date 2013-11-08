@@ -7,7 +7,7 @@ Created on 19/ott/2013
 import cv2
 import numpy as np
 import imageUtils
-import training, os,serial,time
+import training, os, time
 
 def normalize(X, low, high, dtype=None):
     """Normalizes a given array in X to a value between low and high."""
@@ -35,6 +35,7 @@ def main():
     
     global scanning
     global ser
+    global count
     
     # Creazione modello
     model = training.createModel()
@@ -48,12 +49,10 @@ def main():
     if W is None:
         print("Faccia non riconosciuta")
         scanning = True
-        cv2.imshow('display',again)
-        cv2.waitKey(1)
-        time.sleep(4)
-        cv2.imshow('display',home)
-        cv2.waitKey(1)
-        ser = serial.Serial(serialPort, 9600)
+        count=0
+        #cv2.imshow('display',again)
+        #cv2.waitKey(30)
+        #ser = serial.Serial(serialPort, 9600)
         return None
     
     #Effettua la classificazione
@@ -89,13 +88,13 @@ def main():
     im[0:thumbnail.shape[0], 0:thumbnail.shape[1],1] = thumbnail
     im[0:thumbnail.shape[0], 0:thumbnail.shape[1],2] = thumbnail
     cv2.imshow('display',im)
-    cv2.waitKey(15000)
+    cv2.waitKey(1)
+    time.sleep(15)
 
     #cv2.destroyAllWindows()
     scanning = True
-    ser = serial.Serial(serialPort, 9600)
-    cv2.imshow('display',home)
-    cv2.waitKey(1)
+    count=0
+    #ser = serial.Serial(serialPort, 9600)
 
 
 #VARIABILI DA MODIFICARE 
@@ -109,42 +108,38 @@ paintsOriginalPath = '../original_paintings'
 
 #dimensioni delle immagini usate dal riconoscitore
 size = (259,360)
-
 scsize= (800,1280)
-
-
-
-#porta seriale dell'Arduino
-serialPort = 'COM11'
-scanning = True
 
 #carico le immagini dell'interfaccia
 home = cv2.imread("home.jpg", cv2.IMREAD_GRAYSCALE)
 wait = cv2.imread("wait.jpg", cv2.IMREAD_GRAYSCALE)
 again = cv2.imread("again.jpg", cv2.IMREAD_GRAYSCALE)
 
-
+cd = cv2.imread("10.jpg", cv2.IMREAD_GRAYSCALE)
 #creo la finestra in cui visualizzare le immagini
 cv2.namedWindow("display",cv2.WINDOW_NORMAL);
 cv2.setWindowProperty( "display", 0,1);
 
-#visualizzo l'immagine di benvenuto
-cv2.imshow('display',home)
-cv2.waitKey(1)
 
+#porta seriale dell'Arduino
+scanning = True
+count=0
+#cv2.imshow('display',wait)
+#cv2.waitKey(1)
 #Loop di ascolto dell'Arduino
-ser = serial.Serial(serialPort, 9600)
+
 while scanning:
-    print ser.read()
-    if ser.read()=='1':
-        ser.close()
+    count+=1;
+    cd = cv2.imread(str(10-count+1)+".jpg", cv2.IMREAD_GRAYSCALE)
+    cv2.imshow('display',cd)
+    cv2.waitKey(1)
+    time.sleep(1)
+    print count
+    if count==10:
         scanning = False
         #visualizzo l'immagine di attesa
         cv2.imshow('display',wait)
-        camShot()
         cv2.waitKey(1)
-        main()
-
-
-
+        camShot()
+        main()        
 
