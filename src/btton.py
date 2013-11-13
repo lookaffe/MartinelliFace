@@ -40,7 +40,7 @@ def main():
     model = training.createModel()
 
     #TOGLIERE IL COMMENTO ALLA RIGA QUI SOTTO PER AGGIUNGERE LA FASE DI TRAINING
-    training.training(paintsPath, size, model)
+    #training.training(paintsPath, size, model)
     model.load("model.xml")
     
     #Legge l'immagine da riconoscere
@@ -108,7 +108,7 @@ picPath = '../data_pictures'
 paintsOriginalPath = '../original_paintings'
 
 #dimensioni delle immagini usate dal riconoscitore
-size = (388,540) #259, 360
+size = (259,360)
 
 scsize= (800,1280)
 
@@ -126,7 +126,7 @@ again = cv2.imread("again.jpg", cv2.IMREAD_GRAYSCALE)
 
 #creo la finestra in cui visualizzare le immagini
 cv2.namedWindow("display",cv2.WINDOW_NORMAL);
-#cv2.setWindowProperty( "display", 0,1);
+cv2.setWindowProperty( "display", 0,1);
 
 #visualizzo l'immagine di benvenuto
 cv2.imshow('display',home)
