@@ -65,7 +65,6 @@ def main():
     #Effettua la classificazione
     [p_label, p_confidence] = model.predict(np.asarray(W[0]))
 
-    p_label=1
     #mostra l'immagine
 
     #creo un'immagine nera
@@ -78,7 +77,7 @@ def main():
     
     #mostra le immagini di confronto per 5 secondi, poi 
     #chiude le finestre e si rimette in ascolto dell'arduino
-    cv2.waitKey(5000)
+    cv2.waitKey(1000) #WARNING 5000
     
     siz = cv2.cv.GetSize(cv2.cv.fromarray(vis))
     
@@ -96,7 +95,7 @@ def main():
     #im[0:thumbnail.shape[0], 0:thumbnail.shape[1],2] = thumbnail
     cv2.imshow('display',im)
     cv2.waitKey(1)
-    time.sleep(20)
+    time.sleep(1) #WARNING 20
 
     #cv2.destroyAllWindows()
     scanning = True
@@ -143,7 +142,7 @@ while scanning:
     cv2.waitKey(1)
     time.sleep(1)
     print count
-    if count==5:
+    if count==1: #WARNING 5
         scanning = False
         #visualizzo l'immagine di attesa
         cv2.imshow('display',wait)
