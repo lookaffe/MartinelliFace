@@ -7,7 +7,7 @@ Created on 19/ott/2013
 import cv2
 import numpy as np
 import imageUtils
-import training, os, time
+import training, time
 
 def normalize(X, low, high, dtype=None):
     """Normalizes a given array in X to a value between low and high."""
@@ -42,6 +42,7 @@ def main():
     global scanning
     global ser
     global count
+    global presence
     
     # Creazione modello
     model = training.createModel()
@@ -53,7 +54,7 @@ def main():
     #Legge l'immagine da riconoscere
     [W, w] = imageUtils.read_images(picPath, size, 1)
     [V, v] = imageUtils.read_images(picPath, size2, 1)
-    if W is None:
+    if W is None or V is None: #CAMBIO!!
         print("Faccia non riconosciuta")
         scanning = True
         count=0
@@ -98,6 +99,19 @@ def main():
     time.sleep(1) #WARNING 20
 
     #cv2.destroyAllWindows()
+    
+    presence +=1 #conta una persona fotografata
+    if presence == 2:
+        try:
+            presenceFile = open("presence.txt", "a")
+            try:
+                presenceFile.write(" 10 ")
+            finally:
+                presenceFile.close()
+                presence=0
+        except IOError:
+            pass
+    
     scanning = True
     count=0
     #ser = serial.Serial(serialPort, 9600)
@@ -111,6 +125,8 @@ paintsPath = '../data_paintings'
 picPath = '../data_pictures'
 #Path quadri totali
 paintsOriginalPath = '../original_paintings'
+presence=0 #conteggio presenze
+
 
 #dimensioni delle immagini usate dal riconoscitore
 size = (259,360)
@@ -134,6 +150,14 @@ count=0
 #cv2.imshow('display',wait)
 #cv2.waitKey(1)
 #Loop di ascolto dell'Arduino
+try:
+    presenceFile = open("presence.txt", "a")
+    try:
+        presenceFile.write("\n" + str(time.localtime()))
+    finally:
+        presenceFile.close()
+except IOError:
+    pass
 
 while scanning:
     count+=1;
